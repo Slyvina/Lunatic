@@ -27,7 +27,7 @@
 using namespace Slyvina::Units;
 
 namespace Slyvina {
-	namespace Lunatic {
+	namespace NSLunatic {
 
 		lua_CFunction _Lunatic::Panick{ nullptr };
 		std::map<std::string, lua_CFunction> _Lunatic::RegFunction{};
