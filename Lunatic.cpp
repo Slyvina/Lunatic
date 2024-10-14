@@ -1,8 +1,8 @@
 // Lic:
 // Lunatic/Lunatic.cpp
 // Lunatic
-// version: 23.01.17
-// Copyright (C) 2023 Jeroen P. Broks
+// version: 24.10.08
+// Copyright (C) 2023, 2024 Jeroen P. Broks
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
 // arising from the use of this software.
