@@ -1,22 +1,26 @@
-// Lic:
-// Lunatic/Lunatic.cpp
-// Lunatic
-// version: 24.10.08
-// Copyright (C) 2023, 2024 Jeroen P. Broks
-// This software is provided 'as-is', without any express or implied
-// warranty.  In no event will the authors be held liable for any damages
-// arising from the use of this software.
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-// 1. The origin of this software must not be misrepresented; you must not
-// claim that you wrote the original software. If you use this software
-// in a product, an acknowledgment in the product documentation would be
-// appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-// misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
-// EndLic
+// License:
+// 	Lunatic/Lunatic.cpp
+// 	Lunatic
+// 	version: 24.11.16
+// 
+// 	Copyright (C) 2023, 2024 Jeroen P. Broks
+// 
+// 	This software is provided 'as-is', without any express or implied
+// 	warranty.  In no event will the authors be held liable for any damages
+// 	arising from the use of this software.
+// 
+// 	Permission is granted to anyone to use this software for any purpose,
+// 	including commercial applications, and to alter it and redistribute it
+// 	freely, subject to the following restrictions:
+// 
+// 	1. The origin of this software must not be misrepresented; you must not
+// 	   claim that you wrote the original software. If you use this software
+// 	   in a product, an acknowledgment in the product documentation would be
+// 	   appreciated but is not required.
+// 	2. Altered source versions must be plainly marked as such, and must not be
+// 	   misrepresented as being the original software.
+// 	3. This notice may not be removed or altered from any source distribution.
+// End License
 
 #undef Lunatic_Debug
 
@@ -114,6 +118,25 @@ namespace Slyvina {
 
 		Lunatic LunaticByByteCode(Slyvina::Units::Bank buf, std::string chunk) {
 			return LunaticByByteCode(buf->Direct(), buf->Size(), chunk);
+		}
+		bool Lunatic_CheckBoolean(lua_State* L, int pos,bool AnythingGoes) {
+			auto top = lua_gettop(L); 
+			if (pos > top) {
+				luaL_argerror(L, pos, TrSPrintF("Boolean value expected as parameter #%d, but only %d parameters were given", pos, top).c_str()); return false;
+			}
+			if (lua_type(L, pos) != LUA_TBOOLEAN) {
+				if (AnythingGoes) {
+					switch (lua_type(L, pos)) {
+						case LUA_TNUMBER: return luaL_checknumber(L, pos) != 0; 
+						case LUA_TSTRING: return Lunatic_CheckString(L, pos).size() != 0;
+						case LUA_TNIL: return false;
+						default: return true;
+					}
+				}
+				luaL_argerror(L, pos, TrSPrintF("Boolean value expected for paramter #%d", pos).c_str());
+				return false;
+			}
+			return lua_toboolean(L,pos);
 		}
 	}
 

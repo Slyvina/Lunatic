@@ -1,7 +1,7 @@
 // License:
 // 	Lunatic/Lunatic.hpp
 // 	Lunatic (header)
-// 	version: 24.10.15
+// 	version: 24.11.16
 // 
 // 	Copyright (C) 2022, 2023, 2024 Jeroen P. Broks
 // 
@@ -21,25 +21,6 @@
 // 	   misrepresented as being the original software.
 // 	3. This notice may not be removed or altered from any source distribution.
 // End License
-// Lic:
-// Lunatic/Lunatic.hpp
-// Lunatic (header)
-// version: 24.10.08
-// Copyright (C) 2022, 2023, 2024 Jeroen P. Broks
-// This software is provided 'as-is', without any express or implied
-// warranty.  In no event will the authors be held liable for any damages
-// arising from the use of this software.
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-// 1. The origin of this software must not be misrepresented; you must not
-// claim that you wrote the original software. If you use this software
-// in a product, an acknowledgment in the product documentation would be
-// appreciated but is not required.
-// 2. Altered source versions must be plainly marked as such, and must not be
-// misrepresented as being the original software.
-// 3. This notice may not be removed or altered from any source distribution.
-// EndLic
 
 #pragma once
 
@@ -80,6 +61,7 @@ namespace Slyvina {
 			size_t Line{ 0 };
 		};
 
+		struct TLuaVersion { uint32 Maj{ 0 }, Min{ 0 }, Rel{ 0 }; };
 
 
 		class _Lunatic {
@@ -96,7 +78,8 @@ namespace Slyvina {
 
 			static lua_CFunction Panick; 
 			inline lua_State* State() { return _State; } // This makes the state not directly writeable from outside the class.
-			inline static std::string Lua_Version() { return std::string(LUA_VERSION_MAJOR) + "." + std::string(LUA_VERSION_MINOR) + "." + std::string(LUA_VERSION_RELEASE); }
+			inline static std::string LuaVersion() { return std::string(LUA_VERSION_MAJOR) + "." + std::string(LUA_VERSION_MINOR) + "." + std::string(LUA_VERSION_RELEASE); }
+			inline static TLuaVersion GSLuaVersion() { return { std::stoul(LUA_VERSION_MAJOR),std::stoul(LUA_VERSION_MINOR),std::stoul(LUA_VERSION_RELEASE) }; }
 			
 
 			static void Register4All(std::string name, lua_CFunction func, bool force = false);
@@ -121,6 +104,9 @@ namespace Slyvina {
 			~_Lunatic();
 
 		};
+
+		inline String LuaVersion() { return LUA_VERSION_MAJOR "." LUA_VERSION_MINOR "." LUA_VERSION_RELEASE; }
+
 
 		/// <summary>
 		/// Creates a Lunatic state by parsing a Lua script from a string
