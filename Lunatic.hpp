@@ -1,7 +1,7 @@
 // License:
 // 	Lunatic/Lunatic.hpp
 // 	Lunatic (header)
-// 	version: 24.11.16
+// 	version: 24.11.24
 // 
 // 	Copyright (C) 2022, 2023, 2024 Jeroen P. Broks
 // 
@@ -157,6 +157,8 @@ namespace Slyvina {
 		/// <param name="str">The string</param>
 		inline void Lunatic_PushString(lua_State* L, std::string str) { lua_pushstring(L, str.c_str()); }
 		
+
+		bool Lunatic_CheckBoolean(lua_State* L, int pos, bool AnythingGoes=false);
 
 	}
 
