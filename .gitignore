@@ -1,4 +1,5 @@
 Lua/Raw
 Lua/Lib
 *.obj
+*.o
 /Lua/arc
