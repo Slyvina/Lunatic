@@ -1,9 +1,9 @@
 // License:
 // 	Lunatic/Lunatic.hpp
 // 	Lunatic (header)
-// 	version: 24.11.24
+// 	version: 25.04.30
 // 
-// 	Copyright (C) 2022, 2023, 2024 Jeroen P. Broks
+// 	Copyright (C) 2022, 2023, 2024, 2025 Jeroen P. Broks
 // 
 // 	This software is provided 'as-is', without any express or implied
 // 	warranty.  In no event will the authors be held liable for any damages
@@ -49,7 +49,7 @@ namespace Slyvina {
 
 		class _Lunatic;
 
-		typedef std::shared_ptr<_Lunatic> Lunatic; 
+		typedef std::shared_ptr<_Lunatic> Lunatic;
 		typedef std::shared_ptr<_Lunatic> SLunatic;
 		typedef std::unique_ptr<_Lunatic> ULunatic;
 
@@ -76,11 +76,11 @@ namespace Slyvina {
 			bool Debug{ false };
 			std::vector<_LunDbg> Trace{};
 
-			static lua_CFunction Panick; 
+			static lua_CFunction Panick;
 			inline lua_State* State() { return _State; } // This makes the state not directly writeable from outside the class.
 			inline static std::string LuaVersion() { return std::string(LUA_VERSION_MAJOR) + "." + std::string(LUA_VERSION_MINOR) + "." + std::string(LUA_VERSION_RELEASE); }
 			inline static TLuaVersion GSLuaVersion() { return { std::stoul(LUA_VERSION_MAJOR),std::stoul(LUA_VERSION_MINOR),std::stoul(LUA_VERSION_RELEASE) }; }
-			
+
 
 			static void Register4All(std::string name, lua_CFunction func, bool force = false);
 			static inline void Register4All(std::map<std::string, lua_CFunction> Stuff) { for (auto& St : Stuff) Register4All(St.first, St.second); }
@@ -88,7 +88,7 @@ namespace Slyvina {
 			void Register(std::string FuncName, lua_CFunction FuncFunc);
 			void Register(std::map<std::string, lua_CFunction> Stuff);
 
-			void QDoString(std::string source);
+			void QDoString(std::string source,std::string erchunk="<string>");
 			void QDoByteCode(char* buf, size_t len,std::string chunk="");
 			void QDoByteCode(Units::Bank buf, std::string chunk = "");
 
@@ -98,7 +98,7 @@ namespace Slyvina {
 			/// <summary>
 			/// Kills the Lua state within. Please note, this renders this object unusable. Normally this happens automatically when the Lunatic object is destroyed.
 			/// </summary>
-			void Kill(); 
+			void Kill();
 
 			_Lunatic();
 			~_Lunatic();
@@ -113,7 +113,7 @@ namespace Slyvina {
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns></returns>
-		Lunatic LunaticBySource(std::string source);
+		Lunatic LunaticBySource(std::string source, std::string erchnk="<string>");
 
 		/// <summary>
 		/// Creates a Lunatic state by using Lua compiled code from a char* buffer
@@ -132,7 +132,7 @@ namespace Slyvina {
 		/// <param name="chunk"></param>
 		/// <returns></returns>
 		Lunatic LunaticByByteCode(Units::Bank buf, std::string chunk = "");
-		
+
 		/// <summary>
 		/// Quick and dirty function which will return a C++ string from a luaL_checkstring in stead of a const char*.
 		/// </summary>
@@ -140,7 +140,7 @@ namespace Slyvina {
 		/// <param name="pos">Position</param>
 		/// <returns>The wanted string</returns>
 		inline std::string Lunatic_CheckString(lua_State* L, int pos) { return luaL_checkstring(L, pos); }
-		
+
 		/// <summary>
 		/// Quick and dirty function which will return a C++ string from a luaL_optstring in stead of a const char*.
 		/// </summary>
@@ -156,7 +156,7 @@ namespace Slyvina {
 		/// <param name="L">State</param>
 		/// <param name="str">The string</param>
 		inline void Lunatic_PushString(lua_State* L, std::string str) { lua_pushstring(L, str.c_str()); }
-		
+
 
 		bool Lunatic_CheckBoolean(lua_State* L, int pos, bool AnythingGoes=false);
 

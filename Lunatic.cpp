@@ -1,9 +1,9 @@
 // License:
 // 	Lunatic/Lunatic.cpp
 // 	Lunatic
-// 	version: 24.11.16
+// 	version: 25.04.30
 // 
-// 	Copyright (C) 2023, 2024 Jeroen P. Broks
+// 	Copyright (C) 2023, 2024, 2025 Jeroen P. Broks
 // 
 // 	This software is provided 'as-is', without any express or implied
 // 	warranty.  In no event will the authors be held liable for any damages
@@ -50,9 +50,30 @@ namespace Slyvina {
 			for (auto Reg : Stuff) Register(Reg.first, Reg.second);
 		}
 
-		void _Lunatic::QDoString(std::string source) {
+		void _Lunatic::QDoString(std::string source,std::string errchunk) {
+		    static int cnt{0};
 			if (!_State) { std::cout << "Lunatic: Operation cancelled! State is NULL\n"; return; }
-			luaL_loadstring(_State, source.c_str());
+			auto ret = luaL_loadstring(_State, source.c_str());
+			/*
+			std::string LSRC{TrSPrintF("--[[ QDoString]]     local function Temp_Lunatic_%08X()\t",++cnt)};
+			LSRC+=source;
+			LSRC+"\nend\n";
+			LSRC+=TrSPrintF("local TLS%08X,TLE%08X = pcall(Temp_Lunatic_%08X)\n",cnt,cnt);
+			LSRC+=TrSPrintF("assert(TLS%08X,\"Lunatic QDoString Failed: \"..TSE%08X)",cnt);
+			luaL_loadstring(_State, LSRC.c_str());;
+			//*/
+			switch(ret) {
+				case LUA_OK: break; // All's fine!
+				case LUA_ERRSYNTAX:
+					std::cout << "\007\x1b[95mSyntax error detected in \x1b[93m" << errchunk << "\x1b[37m\n";
+					std::cout << "\x1b[96m" << lua_tostring(_State,-1) << "\x1b[37m\n";
+					break;
+				case LUA_ERRMEM: std::cout << "\007\x1b[95mA memory error in \x1b[93m"<< errchunk <<" \x1b[37m\n"; break;
+#ifdef LUA_ERRGCMM
+				case LUA_ERRGCMM: std::cout << "Something went wrong in the Lua garbage collector while setting up a string for Lua scripting and execution\n"; break
+#endif
+				default: std::cout << "Lua gave me "<<ret<<"! No idea what it means!\n"; break;
+			}
 			lua_call(_State, 0, 0);
 		}
 
@@ -95,7 +116,7 @@ namespace Slyvina {
 		_Lunatic::~_Lunatic() {
 			Kill();
 		}
-		void _Lunatic::Kill() {		
+		void _Lunatic::Kill() {
 #ifdef Lunatic_Debug
 			std::cout << ID << ":Releasing(" << Released << ") Lunatic state : " << (unsigned long long)_State << " / " << (uint64)this << "\n";
 #endif
@@ -104,9 +125,9 @@ namespace Slyvina {
 			Released = true;
 		}
 
-		Lunatic LunaticBySource(std::string source) {
+		Lunatic LunaticBySource(std::string source,std::string erchnk) {
 			auto ret{ std::make_shared<_Lunatic>() };
-			ret->QDoString(source);
+			ret->QDoString(source,erchnk);
 			return ret;
 		}
 
@@ -120,14 +141,14 @@ namespace Slyvina {
 			return LunaticByByteCode(buf->Direct(), buf->Size(), chunk);
 		}
 		bool Lunatic_CheckBoolean(lua_State* L, int pos,bool AnythingGoes) {
-			auto top = lua_gettop(L); 
+			auto top = lua_gettop(L);
 			if (pos > top) {
 				luaL_argerror(L, pos, TrSPrintF("Boolean value expected as parameter #%d, but only %d parameters were given", pos, top).c_str()); return false;
 			}
 			if (lua_type(L, pos) != LUA_TBOOLEAN) {
 				if (AnythingGoes) {
 					switch (lua_type(L, pos)) {
-						case LUA_TNUMBER: return luaL_checknumber(L, pos) != 0; 
+						case LUA_TNUMBER: return luaL_checknumber(L, pos) != 0;
 						case LUA_TSTRING: return Lunatic_CheckString(L, pos).size() != 0;
 						case LUA_TNIL: return false;
 						default: return true;
